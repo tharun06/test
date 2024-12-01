@@ -9,28 +9,17 @@ import {
 } from '@backyard/react/Table';
 import { WrapperComponent } from './ManageCost.styles';
 
-const dummyData = [
-  {
-    modelNumber: "BFFDF21321",
-    description: "Motor Grass Cutter",
-    tieredCost: "Done",
-    setupCost: "Edit Cost",
-    imageUrl: "https://via.placeholder.com/50", // Placeholder image
-    status: "green", // For conditional styling
-  },
-];
-
-const ManageCost: React.FC = () => {
+const ManageCost: React.FC = ({ onClickHandler }) => {
   return (
     <WrapperComponent>
       {/* Tab structure */}
       <div data-testid="tab-structure">
         <h2>Manage Cost</h2>
-        <p>Displaying 1 of 1 items</p>
+        <p>Displaying 0 of 0 items</p>
       </div>
 
       {/* Action buttons */}
-      <div className="action-buttons" style={{ textAlign: 'right' }}>
+      <div className="action-buttons" style={{ textAlign: 'right', marginBottom: '16px' }}>
         <Button
           variant="secondary"
           startIcon={<i className="icon-download" />}
@@ -53,46 +42,44 @@ const ManageCost: React.FC = () => {
         <TableHeader>
           <TableRow>
             <TableCell as="th" scope="col">Checkbox</TableCell>
-            <TableCell as="th" scope="col">Model Number</TableCell>
-            <TableCell as="th" scope="col">Item Description</TableCell>
+            <TableCell as="th" scope="col">PCID</TableCell>
+            <TableCell as="th" scope="col">Model #</TableCell>
             <TableCell as="th" scope="col">Tiered Cost</TableCell>
             <TableCell as="th" scope="col">Setup Cost</TableCell>
             <TableCell as="th" scope="col">Item Image</TableCell>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array(10).fill(dummyData[0]).map((item, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <input type="checkbox" />
-              </TableCell>
-              <TableCell>{item.modelNumber}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell>
-                <span style={{ color: item.status }}>{item.tieredCost}</span>
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="tertiary"
-                  size="small"
-                  style={{ textDecoration: "underline" }}
-                >
-                  {item.setupCost}
-                </Button>
-              </TableCell>
-              <TableCell>
-                <img
-                  src={item.imageUrl}
-                  alt="Item"
-                  style={{ width: "50px", height: "50px" }}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
+          {/* Placeholder row */}
+          <TableRow>
+            <TableCell>
+              <input type="checkbox" disabled />
+            </TableCell>
+            <TableCell>--</TableCell>
+            <TableCell>--</TableCell>
+            <TableCell>--</TableCell>
+            <TableCell>
+              <Button
+                variant="tertiary"
+                size="small"
+                style={{ textDecoration: 'underline' }}
+              >
+                Edit Cost
+              </Button>
+            </TableCell>
+            <TableCell>
+              <img
+                src="https://via.placeholder.com/50"
+                alt="Item"
+                style={{ width: '50px', height: '50px' }}
+              />
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </WrapperComponent>
   );
 };
 
-export default ManageCost;
+export { ManageCost };
+export default ManageCost;,
