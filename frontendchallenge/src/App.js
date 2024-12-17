@@ -1,216 +1,147 @@
 import React from "react";
-// import ReactDOM from "react-dom";
-import axios from 'axios';
-import Select from "react-select";
-// import countries from "./countries.json";
-import "./App.css";
-import "@tradeshift/tradeshift-ui";
-import "@tradeshift/tradeshift-ui/ts.css";
-import { makeStyles } from "@material-ui/core/styles";
-import Modal from "@material-ui/core/Modal";
+import { DataTable } from "@backyard/react";
+import { getManageCostColumns } from "./ManageCostColumns";
+import usePaginationData from "./usePaginationData";
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    position: "absolute",
-    width: 550,
-    backgroundColor: theme.palette.background.paper,
-    border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
-}));
+const ManageCost: React.FC = () => {
+  const { data, pagination, loading, setPage, setPageSize } =
+    usePaginationData("/api/your-endpoint");
 
-function rand() {
-  return Math.round(Math.random() * 20) - 10;
-}
-
-function getModalStyle() {
-  const top = 52;
-  const left = 50 + rand();
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`,
-  };
-}
-
-function App() {
-  const classes = useStyles();
-  const required = true;
-  const [countryType, setCountryType] = React.useState([]);
-  const [CountryResult, setCountryResults] = React.useState([]);
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [searchResults, setSearchResults] = React.useState([]);
-  const [results, setResults] = React.useState([]);
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [modalValues, setModalValues] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
-  const [modalStyle] = React.useState(getModalStyle);
-  const intervalRef = React.useRef(null);
-  const apiresults = React.useCallback(() => {
-    axios({
-      "method": "GET",
-      "url": "http://localhost:8006/results",
-    })
-        .then((response) => {
-          setResults(response.data)
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-  }, [])
-  React.useEffect(() => {
-    apiresults()
-  }, [apiresults])
-
-  const CountryApiResults = React.useCallback(() => {
-    axios({
-      "method": "GET",
-      "url": "http://localhost:8006/countries",
-    })
-        .then((response) => {
-          setCountryResults(response.data)
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-  }, [])
-  React.useEffect(() => {
-    CountryApiResults()
-  }, [CountryApiResults])
-
-  const handleChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleCountryChange = (e) => {
-    setCountryType(e.value);
-  };
-
-  const handleOpen = (e) => {
-    setModalValues(e);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const body = (
-    <div style={modalStyle} className={classes.paper}>
-      <h2 id="simple-modal-title">Company Information</h2>
-      <div id="simple-modal-description">
-        {modalValues && modalValues.name}<br />
-        Company Status: <p style={{ color: modalValues && modalValues.status === 'ACTIVE' ? 'green' : 'red'}}>{modalValues && modalValues.status}</p>
-        COMPANY REGISTRATION NUMBER <br />
-        {modalValues && modalValues.registrationNumber} <br /> <br />
-        VAT NUMBER <br />
-        {modalValues && modalValues.vatNumber} <br /> <br />
-        REGISTERED ADDRESS <br />
-        {modalValues && modalValues.address} <br /> <br />
-        COUNTRY <br />
-        {modalValues && modalValues.country} <br /> <br />
-        ADDITIONAL STATUS DETAILS <br />
-        {modalValues && modalValues.additionalStatusDetails} <br /> <br />
-        COMPANY DESCRIPTION <br />
-        {modalValues && modalValues.description} <br /> <br />
-      </div>
-    </div>
-  );
-
-  React.useEffect(() => {
-    if (searchTerm) {
-      setIsSearching(true);
-    }
-    if (searchTerm) {
-      setIsSearching(true);
-      intervalRef.current = setTimeout(() => {
-        setIsSearching(false);
-        const filteredResults = results.filter(
-          (option) =>
-            option.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
-        );
-        const filteredResultsByCountry = countryType
-          ? filteredResults.filter(
-              (option) =>
-                option.country
-                  .toLowerCase()
-                  .indexOf(countryType.toLowerCase()) > -1
-            )
-          : filteredResults;
-        setSearchResults(filteredResultsByCountry);
-      }, 1000);
-    } else {
-      setSearchResults([]);
-      clearTimeout(intervalRef.current);
-    }
-    return () => clearTimeout(intervalRef.current);
-  }, [searchTerm]);
+  const columns = getManageCostColumns();
 
   return (
-    <div style={{ position: "absolute", right: "200px" }}>
-      <h2>TradeShift Global Search</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua>
-      </p>
-      <div style={{ width: "200px" }}>
-        <>
-          <Select
-            options={CountryResult}
-            required={ required}
-            placeholder="Please select"
-            onChange={handleCountryChange}
-          />
-          { (
-            <input
-              tabIndex={-1}
-              autoComplete="off"
-              style={{ opacity: 0, height: 0 }}
-              required={required}
-            />
-          )}
-        </>
-        <br />
-        <br />
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={searchTerm}
-          onChange={handleChange}
-          style={{ width: "500px" }}
-        />
-      </div>
-      <div>
-        {isSearching && <div>Searching ...</div>}
-        <br/>{searchResults.length > 0 && (
-          <div>Search Results for "{searchTerm}" </div>
-        )}
-        {!isSearching && searchTerm && searchResults.length === 0 && (
-          <div> No Search Results for "{searchTerm}" </div>
-        )}{" "}
-        <br />
-        {searchResults.map((item) => (
-          <>
-            <div onClick={() => handleOpen(item)} key={item.id}>
-              {item.name} <br />
-              {item.address} <br />
-              <br />
-            </div>
-            <Modal
-              open={open}
-              onClose={handleClose}
-              aria-labelledby="simple-modal-title"
-              aria-describedby="simple-modal-description"
-            >
-              {body}
-            </Modal>
-          </>
-        ))}
-      </div>
-    </div>
+    <WrapperComponent>
+      <DataTable
+        columns={columns}
+        data={data}
+        pageIndex={pagination.page - 1} // DataTable expects 0-based index
+        pageSize={pagination.pageSize}
+        onPageChange={(pageIndex) => setPage(pageIndex + 1)}
+        onPageSizeChange={setPageSize}
+        headerStyle={{ colors: "subdued" }}
+        sizes="large"
+      />
+
+      {loading && <p>Loading...</p>}
+
+      <Typography>
+        {`Displaying ${data.length} of ${pagination.totalCount} items`}
+      </Typography>
+    </WrapperComponent>
   );
+};
+
+export default ManageCost;
+import { useState, useEffect } from "react";
+
+interface Pagination {
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
 }
 
-export default App;
+const usePaginationData = (endpoint: string) => {
+  const [data, setData] = useState<any[]>([]);
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    pageSize: 20,
+    totalCount: 0,
+    totalPages: 0,
+  });
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async (page: number, pageSize: number) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${endpoint}?page=${page}&pageSize=${pageSize}`
+      );
+      const result = await response.json();
+
+      setData(result.data || []);
+      setPagination({
+        page: result.pagination.page,
+        pageSize: result.pagination.pageSize,
+        totalCount: result.pagination.totalCount,
+        totalPages: result.pagination.totalPages,
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(pagination.page, pagination.pageSize);
+  }, [pagination.page, pagination.pageSize]);
+
+  const setPage = (newPage: number) =>
+    setPagination((prev) => ({ ...prev, page: newPage }));
+
+  const setPageSize = (newPageSize: number) =>
+    setPagination((prev) => ({ ...prev, pageSize: newPageSize, page: 1 }));
+
+  return { data, pagination, loading, setPage, setPageSize };
+};
+
+export default usePaginationData;
+
+
+import React from "react";
+import { Typography, Button } from "@some-ui-library";
+import { CheckCircleFilled } from "@some-icon-library";
+
+export const getManageCostColumns = () => [
+  {
+    Header: "Model Number",
+    accessor: "modelNumber",
+    maxWidth: 500,
+    Cell: ({ row }: { row: any }) => (
+      <div key={row.original.modeNumber}>
+        <img src={row.original.itemImage} alt="Item" />
+        <div className="model-number-container">
+          <p className="model-number">{row.original.modeNumber}</p>
+          <Typography
+            variant="label"
+            className="equivalent-number"
+          >
+            {row.original.equivalentNumber}
+          </Typography>
+        </div>
+      </div>
+    ),
+  },
+  {
+    Header: "Item Description",
+    accessor: "itemDescription",
+    Cell: ({ value }: { value: string }) => (
+      <Typography size="size_12">{value}</Typography>
+    ),
+  },
+  {
+    Header: "Tiered Cost",
+    accessor: "tieredCost",
+    Cell: ({ value, row }: { value: string; row: any }) => (
+      <div className="tiered-cost-cell">
+        {value === "Done" && (
+          <>
+            <CheckCircleFilled
+              color="icon_green"
+              style={{ marginRight: "8px" }}
+              size="size_12"
+            />
+            <Typography>Done</Typography>
+          </>
+        )}
+        <Button variant="ghost" className="tiered-cost-link">
+          Edit Cost
+        </Button>
+      </div>
+    ),
+  },
+];
+
+
+
