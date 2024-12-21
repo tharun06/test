@@ -1,16 +1,1 @@
-const transformToFilterObject = (data) => ({
-  vendorNumber: data.vendors.map((vendor) => parseInt(vendor.id, 10)),
-  modelNum: data.searchMode === "model" ? data.searchValue.split("\n").map((value) => value.trim()) : [],
-  itemNum: data.searchMode === "LIN" ? data.searchValue.split("\n").map((value) => value.trim()) : [],
-  barcode: data.searchMode === "barcode" ? data.searchValue.split("\n").map((value) => value.trim()) : [],
-  subStatus: [],
-  programTypeApprovals: null,
-  programType: [],
-  brandName: data.brands.map((brand) => brand.name),
-  eligibility: data.eligibility.map((e) => e.value),
-  itemBehavior: data.itemBehavior.map((behavior) => behavior.name),
-  sellingChannel: [...(data.online ? ["Online"] : []), ...(data.store ? ["Store"] : [])],
-  subDivisionNumber: data.subDivisions.map((sub) => sub.name),
-  categoryId: data.category.id,
-  isCreateFlow: true,
-});
+test
